@@ -1,10 +1,10 @@
-﻿# 🏢 Society Maintenance Tracker
+﻿#  Society Maintenance Tracker
 
 A comprehensive apartment society maintenance and complaint management platform built with **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS**, and **Prisma ORM**.
 
 ---
 
-## 📁 Repository & Folder Structure
+##  Repository & Folder Structure
 
 The repository is organized following clean architectural practices:
 
