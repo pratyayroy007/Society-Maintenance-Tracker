@@ -1,0 +1,80 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  flatNumber    String?
+  phoneNumber   String?
+  role          String    @default("RESIDENT") // RESIDENT, ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  complaints    Complaint[]
+  statusChanges ComplaintStatusHistory[]
+  notices       Notice[]
+}
+
+model Complaint {
+  id            String          @id @default(cuid())
+  title         String
+  description   String
+  category      String          // PLUMBING, ELECTRICAL, CARPENTRY, CLEANING, ELEVATOR, SECURITY, PAINTING, OTHER
+  status        String          @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  priority      String          @default("MEDIUM") // LOW, MEDIUM, HIGH
+  photoUrl      String?
+  residentId    String
+  resident      User            @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  
+  resolvedAt    DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  history       ComplaintStatusHistory[]
+
+  @@index([status])
+  @@index([category])
+  @@index([residentId])
+}
+
+model ComplaintStatusHistory {
+  id             String     @id @default(cuid())
+  complaintId    String
+  complaint      Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  previousStatus String?
+  newStatus      String
+  changedById    String
+  changedBy      User       @relation(fields: [changedById], references: [id])
+  note           String?
+  createdAt      DateTime   @default(now())
+
+  @@index([complaintId])
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  isImportant Boolean  @default(false)
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isImportant])
+}
+
+model SystemSetting {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}

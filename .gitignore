@@ -1,0 +1,36 @@
+﻿# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+/dist/
+/build/
+
+# SQLite databases (local dev data)
+prisma/*.db
+prisma/*.db-journal
+*.db
+*.db-journal
+
+# Environment variables (do not commit secrets)
+.env
+.env*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
