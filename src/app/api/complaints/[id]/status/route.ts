@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionFromRequest } from '@/lib/auth';
 import { updateStatusSchema } from '@/lib/validators';
+import { notifyStatusChange } from '@/lib/email';
 
 export async function PATCH(
   request: NextRequest,
@@ -70,6 +71,17 @@ export async function PATCH(
 
       return updated;
     });
+
+    // Send email notification to resident in background
+    if (existingComplaint.resident?.email) {
+      notifyStatusChange(
+        existingComplaint.resident.email,
+        existingComplaint.resident.name,
+        existingComplaint.title,
+        newStatus,
+        note
+      ).catch((err) => console.error('Status change email error:', err));
+    }
 
     const fullComplaint = await prisma.complaint.findUnique({
       where: { id: updatedComplaint.id },

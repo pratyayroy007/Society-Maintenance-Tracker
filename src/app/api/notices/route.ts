@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionFromRequest } from '@/lib/auth';
 import { createNoticeSchema } from '@/lib/validators';
+import { notifyImportantNotice } from '@/lib/email';
 
 export async function GET() {
   try {
@@ -56,6 +57,13 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // If marked important, dispatch email notification to all residents
+    if (notice.isImportant) {
+      notifyImportantNotice(notice.title, notice.content).catch((err) =>
+        console.error('Important notice email broadcast error:', err)
+      );
+    }
 
     return NextResponse.json(
       { message: 'Notice posted successfully', notice },
