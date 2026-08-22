@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Building2, Lock, Mail, AlertCircle, Loader2, ArrowRight, UserCheck, Shield, Sun, Moon } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Loader2, ArrowRight, UserCheck, Shield, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 
 export default function LoginPage() {
@@ -29,7 +29,6 @@ export default function LoginPage() {
         throw new Error(data.error || 'Invalid email or password');
       }
 
-      // Instant clean full-page navigation
       if (data.user?.role === 'ADMIN') {
         window.location.href = '/admin';
       } else {
@@ -58,14 +57,19 @@ export default function LoginPage() {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-3">
-          <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
-            <Building2 className="w-6 h-6" />
+        <Link href="/" className="inline-flex flex-col items-center gap-2 mb-3 group">
+          <img
+            src="/logo.jpg"
+            alt="Residenza Logo"
+            className="w-16 h-16 rounded-2xl object-cover shadow-xl border border-slate-200 dark:border-slate-800 group-hover:scale-105 transition"
+          />
+          <div>
+            <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white block">Residenza</span>
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-widest">Since 2026</span>
           </div>
-          <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Residenza</span>
         </Link>
-        <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Sign in to your account</h2>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Sign in to your account</h2>
+        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
           Or{' '}
           <Link href="/register" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
             register as a new resident

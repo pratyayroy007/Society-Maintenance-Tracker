@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Building2,
   LayoutDashboard,
   ClipboardList,
   Sliders,
@@ -14,8 +13,6 @@ import {
   ChevronRight,
   Shield,
   Home,
-  CheckCircle2,
-  AlertTriangle,
   Layers,
 } from 'lucide-react';
 import { UserSession } from '@/lib/types';
@@ -107,15 +104,17 @@ export default function AppSidebar({
         collapsed ? 'w-16' : 'w-64'
       )}
     >
-      {/* Brand Header */}
-      <div className="flex h-16 items-center justify-between px-4 border-b">
+      {/* Brand Header with Residenza Logo */}
+      <div className="flex h-16 items-center justify-between px-3.5 border-b">
         <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <Building2 className="h-5 w-5" />
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="Residenza Logo"
+            className="h-9 w-9 shrink-0 rounded-lg object-cover shadow-sm border border-border"
+          />
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="font-bold text-sm leading-tight tracking-tight">Residenza</span>
+              <span className="font-bold text-sm leading-tight tracking-tight text-foreground">Residenza</span>
               <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
                 {user?.role === 'ADMIN' ? 'Admin Portal' : 'Resident Portal'}
               </span>
