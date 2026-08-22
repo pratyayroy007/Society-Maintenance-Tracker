@@ -7,7 +7,6 @@ interface EmailPayload {
   html: string;
 }
 
-// Create reusable transporter
 function getTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -27,9 +26,13 @@ function getTransporter() {
 }
 
 export async function sendEmail({ to, subject, html }: EmailPayload): Promise<{ success: boolean; id?: string }> {
-  const recipients = Array.isArray(to) ? to.join(', ') : to;
+  const recipientList = Array.isArray(to) ? to : [to];
+  const recipientsString = recipientList.join(', ');
 
-  // 1. Check for SMTP Transporter (e.g. Gmail / Brevo / SendGrid / Custom SMTP)
+  let sentSuccessfully = false;
+  let messageId = `msg_${Date.now()}`;
+
+  // 1. Try SMTP Transporter (e.g. Gmail / Brevo / Custom SMTP)
   const transporter = getTransporter();
   if (transporter) {
     try {
@@ -40,54 +43,71 @@ export async function sendEmail({ to, subject, html }: EmailPayload): Promise<{ 
         subject,
         html,
       });
-      console.log(`✅ [REAL EMAIL SENT via SMTP] MessageId: ${info.messageId} to ${recipients}`);
-      return { success: true, id: info.messageId };
+      console.log(`✅ [REAL EMAIL SENT via SMTP] MessageId: ${info.messageId} to ${recipientsString}`);
+      sentSuccessfully = true;
+      messageId = info.messageId;
     } catch (err) {
-      console.error('❌ SMTP Email sending failed:', err);
+      console.error('❌ SMTP Email delivery failed:', err);
     }
   }
 
-  // 2. Check for Resend API Key
-  const resendKey = process.env.RESEND_API_KEY;
-  if (resendKey && resendKey !== 'mock_key_for_dev' && !resendKey.startsWith('mock_')) {
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${resendKey}`,
-        },
-        body: JSON.stringify({
-          from: 'SocietyCare <onboarding@resend.dev>',
-          to: Array.isArray(to) ? to : [to],
+  // 2. Try Resend API
+  if (!sentSuccessfully) {
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey && resendKey !== 'mock_key_for_dev' && !resendKey.startsWith('mock_')) {
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: 'SocietyCare <onboarding@resend.dev>',
+            to: recipientList,
+            subject,
+            html,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log(`✅ [REAL EMAIL SENT via Resend] Id: ${data.id} to ${recipientsString}`);
+          sentSuccessfully = true;
+          messageId = data.id;
+        }
+      } catch (err) {
+        console.error('❌ Resend API dispatch failed:', err);
+      }
+    }
+  }
+
+  // Always log to console in dev mode
+  console.log(`\n📬 [DISPATCHED EMAIL NOTIFICATION]`);
+  console.log(`To: ${recipientsString}`);
+  console.log(`Subject: ${subject}`);
+  console.log(`Status: ${sentSuccessfully ? 'DELIVERED TO INBOX' : 'STORED IN APP INBOX (Add SMTP_USER/SMTP_PASS in .env for external inbox delivery)'}\n`);
+
+  // Persist each recipient's email in the database for the In-App Notification Inbox
+  try {
+    for (const recipient of recipientList) {
+      await prisma.emailLog.create({
+        data: {
+          to: recipient.trim().toLowerCase(),
           subject,
           html,
-        }),
+          status: sentSuccessfully ? 'DELIVERED' : 'SENT',
+        },
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        console.log(`✅ [REAL EMAIL SENT via Resend] Id: ${data.id} to ${recipients}`);
-        return { success: true, id: data.id };
-      } else {
-        const err = await res.json();
-        console.warn('Resend API Warning:', err);
-      }
-    } catch (err) {
-      console.error('❌ Resend email dispatch failed:', err);
     }
+  } catch (dbErr) {
+    console.error('Failed to log email to DB:', dbErr);
   }
 
-  // 3. Fallback: Log email clearly to console in dev mode
-  console.log(`\n📬 [EMAIL DISPATCH LOG — Configure SMTP_USER/SMTP_PASS in .env to deliver to real inboxes]`);
-  console.log(`To: ${recipients}`);
-  console.log(`Subject: ${subject}`);
-  console.log(`Body Preview: ${html.replace(/<[^>]*>/g, ' ').substring(0, 180)}...\n`);
-
-  return { success: true, id: `mock_${Date.now()}` };
+  return { success: true, id: messageId };
 }
 
-// 1. Trigger when a resident raises a new complaint
+// Trigger: Resident raises a complaint
 export async function notifyComplaintRaised(
   residentEmail: string,
   residentName: string,
@@ -100,50 +120,50 @@ export async function notifyComplaintRaised(
   const ticketRef = complaintId.substring(complaintId.length - 6).toUpperCase();
 
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-      <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 20px; border-radius: 8px; text-align: center; color: #ffffff;">
-        <h2 style="margin: 0; font-size: 22px;">🏢 SocietyCare Maintenance</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 13px;">Complaint Confirmation #${ticketRef}</p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 22px; border-radius: 8px; text-align: center; color: #ffffff;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: -0.5px;">🏢 SocietyCare Maintenance</h2>
+        <p style="margin: 6px 0 0 0; opacity: 0.95; font-size: 13px; font-weight: 500;">Ticket Confirmation #${ticketRef}</p>
       </div>
 
       <div style="padding: 24px 8px 16px 8px; color: #1e293b;">
-        <p style="font-size: 15px;">Dear <strong>${residentName}</strong>,</p>
+        <p style="font-size: 15px; margin-top: 0;">Dear <strong>${residentName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-          Your maintenance complaint has been successfully registered in the society portal. Our maintenance administration team has been notified and will review your ticket.
+          Your maintenance complaint has been successfully registered in the society portal. Our administration team has been notified.
         </p>
 
-        <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 16px; margin: 20px 0; border-radius: 6px;">
-          <table style="width: 100%; font-size: 13px; color: #334155;">
+        <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 18px; margin: 20px 0; border-radius: 6px;">
+          <table style="width: 100%; font-size: 13px; color: #334155; border-collapse: collapse;">
             <tr>
-              <td style="padding: 4px 0; font-weight: bold; width: 120px;">Ticket ID:</td>
-              <td style="padding: 4px 0;">#${ticketRef}</td>
+              <td style="padding: 6px 0; font-weight: bold; width: 130px; color: #64748b;">Ticket Reference:</td>
+              <td style="padding: 6px 0; font-weight: bold; color: #0f172a;">#${ticketRef}</td>
             </tr>
             <tr>
-              <td style="padding: 4px 0; font-weight: bold;">Subject:</td>
-              <td style="padding: 4px 0;">${complaintTitle}</td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Subject:</td>
+              <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${complaintTitle}</td>
             </tr>
             <tr>
-              <td style="padding: 4px 0; font-weight: bold;">Category:</td>
-              <td style="padding: 4px 0;"><span style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${category}</span></td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Category:</td>
+              <td style="padding: 6px 0;"><span style="background: #e0e7ff; color: #3730a3; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">${category}</span></td>
             </tr>
             <tr>
-              <td style="padding: 4px 0; font-weight: bold;">Initial Status:</td>
-              <td style="padding: 4px 0;"><span style="color: #d97706; font-weight: bold;">OPEN (Pending Triage)</span></td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Initial Status:</td>
+              <td style="padding: 6px 0;"><span style="color: #d97706; font-weight: bold;">OPEN (Pending Triage)</span></td>
             </tr>
             <tr>
-              <td style="padding: 4px 0; font-weight: bold;">Priority:</td>
-              <td style="padding: 4px 0;">${priority}</td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Priority Level:</td>
+              <td style="padding: 6px 0; font-weight: bold;">${priority}</td>
             </tr>
           </table>
 
-          <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
-            <strong style="font-size: 12px; color: #64748b;">Description:</strong>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #334155; line-height: 1.5;">${description}</p>
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
+            <strong style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Issue Description:</strong>
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #334155; line-height: 1.5;">${description}</p>
           </div>
         </div>
 
         <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
-          You will receive automatic email updates whenever a technician is assigned or the status changes. You can also view the full timeline history in your resident dashboard.
+          You can track this complaint in your resident portal at any time to see real-time updates and technician assignments.
         </p>
 
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
@@ -161,7 +181,7 @@ export async function notifyComplaintRaised(
   });
 }
 
-// 2. Trigger when complaint status changes
+// Trigger: Status changes
 export async function notifyStatusChange(
   residentEmail: string,
   residentName: string,
@@ -178,8 +198,8 @@ export async function notifyStatusChange(
   const color = statusColors[newStatus] || '#4f46e5';
 
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-      <div style="background-color: #4f46e5; padding: 18px; border-radius: 8px; text-align: center; color: white;">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+      <div style="background-color: #4f46e5; padding: 20px; border-radius: 8px; text-align: center; color: white;">
         <h2 style="margin: 0; font-size: 20px;">🏢 SocietyCare Status Update</h2>
       </div>
       <div style="padding: 20px 8px 8px 8px; color: #1e293b;">
@@ -194,7 +214,7 @@ export async function notifyStatusChange(
           ${note ? `<p style="margin: 0; font-size: 13px; color: #334155;"><strong>Admin Remarks:</strong> <em style="color: #475569;">"${note}"</em></p>` : ''}
         </div>
 
-        <p style="font-size: 13px; color: #64748b;">You can log in to your resident portal anytime to track progress.</p>
+        <p style="font-size: 13px; color: #64748b;">You can log in to your resident dashboard anytime to track progress.</p>
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0 12px 0;" />
         <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">SocietyCare Automated Notification System</p>
       </div>
@@ -208,7 +228,7 @@ export async function notifyStatusChange(
   });
 }
 
-// 3. Trigger on important pinned notices
+// Trigger: Important notices
 export async function notifyImportantNotice(noticeTitle: string, noticeContent: string) {
   try {
     const residents = await prisma.user.findMany({
@@ -220,7 +240,7 @@ export async function notifyImportantNotice(noticeTitle: string, noticeContent: 
     const emails = residents.map((r) => r.email);
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fef3c7; background-color: #ffffff; border-radius: 12px;">
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fef3c7; background-color: #ffffff; border-radius: 12px;">
         <div style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); padding: 18px; border-radius: 8px; text-align: center; color: white;">
           <h2 style="margin: 0; font-size: 20px;">⚠️ IMPORTANT SOCIETY ANNOUNCEMENT</h2>
         </div>

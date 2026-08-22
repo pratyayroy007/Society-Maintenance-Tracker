@@ -78,3 +78,14 @@ model SystemSetting {
   description String?
   updatedAt   DateTime @updatedAt
 }
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  html      String
+  status    String   @default("SENT")
+  createdAt DateTime @default(now())
+
+  @@index([to])
+}

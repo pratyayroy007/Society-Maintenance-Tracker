@@ -160,7 +160,7 @@ export default function ResidentDashboard() {
               <FacilityCard
                 key={facility.category}
                 facility={facility}
-                onSelect={(cat) => {
+                onSelect={() => {
                   setIsRaiseModalOpen(true);
                 }}
               />
@@ -211,11 +211,18 @@ export default function ResidentDashboard() {
           </div>
         </div>
 
-        {/* Complaints Grid & Notice Board */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Complaints Grid & Notice Board - WITH ID for smooth scrolling */}
+        <div id="my-complaints-section" className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start scroll-mt-20">
           <div className="lg:col-span-2 space-y-5">
-            {/* Search & Filter Toolbar */}
+            {/* Header + Search & Filter Toolbar */}
             <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>My Raised Complaints ({filteredComplaints.length})</span>
+                </h3>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -237,7 +244,7 @@ export default function ResidentDashboard() {
                     <option value="ALL">All Statuses</option>
                     <option value="OPEN">Open Only</option>
                     <option value="IN_PROGRESS">In Progress</option>
-                    <option value="RESOLVED">Resolved Only</option>
+                    <option value="RESOLVED">Resolved</option>
                   </select>
 
                   <select
