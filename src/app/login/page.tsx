@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Lock, Mail, AlertCircle, Loader2, ArrowRight, UserCheck, Shield, Sun, Moon } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Loader2, ArrowRight, UserCheck, Shield, Sun, Moon, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const { theme, toggleTheme } = useTheme();
@@ -46,123 +48,208 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition"
-        >
-          {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
-        </button>
-      </div>
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex flex-col items-center gap-2 mb-3 group">
+    <div className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-background">
+      {/* Left Column: Brand Showcase (shadcn-admin Style) */}
+      <div className="relative hidden lg:flex flex-col justify-between p-10 bg-slate-950 text-white overflow-hidden border-r border-slate-800">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-950 to-slate-950" />
+        
+        {/* Brand Header */}
+        <div className="relative z-10 flex items-center gap-3">
           <img
             src="/logo.jpg"
             alt="Residenza Logo"
-            className="w-16 h-16 rounded-2xl object-cover shadow-xl border border-slate-200 dark:border-slate-800 group-hover:scale-105 transition"
+            style={{ width: '40px', height: '40px', maxWidth: '40px' }}
+            className="w-10 h-10 rounded-xl object-cover shadow-lg border border-white/10"
           />
           <div>
-            <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white block">Residenza</span>
-            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-widest">Since 2026</span>
+            <span className="font-extrabold text-lg tracking-tight text-white block">Residenza</span>
+            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest block -mt-1">Since 2026</span>
           </div>
-        </Link>
-        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Sign in to your account</h2>
-        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-          Or{' '}
-          <Link href="/register" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
-            register as a new resident
-          </Link>
-        </p>
+        </div>
+
+        {/* Centerpiece Feature Callouts */}
+        <div className="relative z-10 space-y-6 max-w-md my-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
+            🏢 Apartment Maintenance Platform
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+            Transparent maintenance resolution for modern societies.
+          </h1>
+
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Direct photo evidence uploads, automated SLA overdue tracking, live email notifications, and chronological audit histories.
+          </p>
+
+          <div className="space-y-3 pt-2 text-xs text-slate-300">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Real-time email dispatch via Google SMTP</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Dynamic overdue threshold & priority controls</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Immutable ticket audit timeline & remarks</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="relative z-10 text-xs text-slate-500">
+          © 2026 Residenza Portal • Designed with shadcn-admin
+        </div>
       </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white dark:bg-slate-900 py-8 px-6 shadow-xl shadow-slate-200/50 dark:shadow-none rounded-2xl border border-slate-100 dark:border-slate-800 sm:px-10">
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+      {/* Right Column: Sign In Form */}
+      <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 relative">
+        {/* Top Controls */}
+        <div className="flex items-center justify-between">
+          <Link href="/" className="lg:hidden flex items-center gap-2">
+            <img
+              src="/logo.jpg"
+              alt="Residenza Logo"
+              style={{ width: '32px', height: '32px', maxWidth: '32px' }}
+              className="w-8 h-8 rounded-lg object-cover border"
+            />
+            <span className="font-extrabold text-sm tracking-tight">Residenza</span>
+          </Link>
 
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                Email address
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                <input
-                  type="email"
-                  required
-                  placeholder="resident@society.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition"
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-9 w-9 text-muted-foreground"
+              title="Toggle Theme"
             >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
+              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4 text-amber-400" />}
+            </Button>
 
-          {/* Quick Login Demos */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center mb-3">
-              One-Click Demo Logins
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('john@society.com', 'Password@123')}
-                className="flex flex-col items-start p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 text-left transition"
-              >
-                <div className="flex items-center gap-1 text-xs font-bold text-indigo-900 dark:text-indigo-300">
-                  <UserCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Resident</span>
-                </div>
-                <span className="text-[10px] text-indigo-600 dark:text-indigo-400">john@society.com</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin@society.com', 'Password@123')}
-                className="flex flex-col items-start p-2.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/40 hover:bg-purple-50 dark:hover:bg-purple-950/60 border border-purple-100 dark:border-purple-900/50 text-left transition"
-              >
-                <div className="flex items-center gap-1 text-xs font-bold text-purple-900 dark:text-purple-300">
-                  <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                  <span>Admin</span>
-                </div>
-                <span className="text-[10px] text-purple-600 dark:text-purple-400">admin@society.com</span>
-              </button>
-            </div>
+            <Link href="/register">
+              <Button variant="outline" size="sm" className="text-xs">
+                Register
+              </Button>
+            </Link>
           </div>
+        </div>
+
+        {/* Form Center Container */}
+        <div className="mx-auto w-full max-w-sm space-y-6 my-auto py-8">
+          <div className="space-y-2 text-center">
+            <div className="flex justify-center mb-3">
+              <img
+                src="/logo.jpg"
+                alt="Residenza Logo"
+                style={{ width: '56px', height: '56px', maxWidth: '56px' }}
+                className="w-14 h-14 rounded-2xl object-cover shadow-md border"
+              />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Sign In to Residenza</h2>
+            <p className="text-xs text-muted-foreground">
+              Enter your credentials or use the demo accounts below
+            </p>
+          </div>
+
+          <Card className="p-6 shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/15 border border-destructive/30 text-destructive text-xs font-medium">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full font-semibold text-xs shadow-xs gap-1.5 mt-2"
+              >
+                {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>{loading ? 'Authenticating...' : 'Sign In with Email'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </form>
+
+            {/* Quick Demo Logins */}
+            <div className="mt-6 pt-5 border-t space-y-2">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-center mb-2">
+                One-Click Demo Logins
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('john@society.com', 'Password@123')}
+                  className="flex flex-col items-start p-2.5 rounded-lg bg-secondary hover:bg-accent border text-left transition"
+                >
+                  <div className="flex items-center gap-1 text-xs font-bold text-foreground">
+                    <UserCheck className="w-3.5 h-3.5 text-primary" />
+                    <span>Resident</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground truncate w-full">john@society.com</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('admin@society.com', 'Password@123')}
+                  className="flex flex-col items-start p-2.5 rounded-lg bg-secondary hover:bg-accent border text-left transition"
+                >
+                  <div className="flex items-center gap-1 text-xs font-bold text-foreground">
+                    <Shield className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Admin</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground truncate w-full">admin@society.com</span>
+                </button>
+              </div>
+            </div>
+          </Card>
+
+          <p className="text-center text-xs text-muted-foreground">
+            Don't have an account?{' '}
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+              Create a resident account
+            </Link>
+          </p>
+        </div>
+
+        <div className="text-center text-[11px] text-muted-foreground">
+          Residenza Apartment Society Maintenance System
         </div>
       </div>
     </div>
