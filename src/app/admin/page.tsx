@@ -10,23 +10,18 @@ import AdminThresholdModal from '@/components/AdminThresholdModal';
 import NoticeBoard, { NoticeItem } from '@/components/NoticeBoard';
 import { UserSession, ComplaintWithDetails } from '@/lib/types';
 import {
-  Building2,
   Shield,
   Clock,
   CheckCircle2,
   Wrench,
   AlertTriangle,
-  FileText,
   Search,
   Sliders,
   PlusCircle,
   RefreshCw,
   Eye,
   Edit,
-  ArrowUpDown,
-  Calendar,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -129,7 +124,6 @@ export default function AdminDashboardPage() {
     fetchDashboardData();
   }, []);
 
-  // Filter and sort complaints
   const filteredComplaints = complaints.filter((c) => {
     if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
     if (categoryFilter !== 'ALL' && c.category !== categoryFilter) return false;
@@ -150,7 +144,6 @@ export default function AdminDashboardPage() {
     return true;
   });
 
-  // Calculate Metrics
   const metrics = {
     total: complaints.length,
     open: complaints.filter((c) => c.status === 'OPEN').length,
@@ -159,7 +152,6 @@ export default function AdminDashboardPage() {
     overdue: complaints.filter((c) => c.isOverdue).length,
   };
 
-  // Category Breakdown for reporting
   const categoryCounts: Record<string, number> = {};
   complaints.forEach((c) => {
     categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1;
@@ -167,34 +159,34 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-semibold text-slate-500">Loading Administrator Command Center...</p>
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading Administrator Command Center...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-200">
       <Navbar user={user} />
 
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
         {/* Admin Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 text-[10px] font-black text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded uppercase tracking-wider">
                 <Shield className="w-3 h-3" /> Administrator Portal
               </span>
-              <span className="text-xs text-slate-400 font-semibold">• Society Management Command Center</span>
+              <span className="text-xs text-slate-400 font-semibold">• Operations & Triage</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Maintenance Operations & Triage
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Maintenance Command Center
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Review resident tickets, update statuses with audit trail notes, configure SLAs, and broadcast notices.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Manage tickets, update status workflows, dispatch email notifications, and set SLA thresholds.
             </p>
           </div>
 
@@ -206,16 +198,16 @@ export default function AdminDashboardPage() {
                 fetchNotices();
               }}
               title="Refresh Data"
-              className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-indigo-600' : ''}`} />
             </button>
 
             <button
               onClick={() => setIsThresholdModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition"
             >
-              <Sliders className="w-4 h-4 text-slate-500" />
+              <Sliders className="w-4 h-4 text-slate-500 dark:text-slate-400" />
               <span>Overdue SLA: <strong>{thresholdDays} Days</strong></span>
             </button>
 
@@ -231,46 +223,46 @@ export default function AdminDashboardPage() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Complaints</span>
-            <h3 className="text-2xl font-black text-slate-900 mt-1">{metrics.total}</h3>
-            <span className="text-[10px] text-slate-400">All registered issues</span>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{metrics.total}</h3>
+            <span className="text-[10px] text-slate-400">All registered</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-amber-200 bg-amber-50/20 shadow-xs">
-            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">Open (Pending)</span>
-            <h3 className="text-2xl font-black text-amber-600 mt-1">{metrics.open}</h3>
-            <span className="text-[10px] text-amber-600/80">Requires triage</span>
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/20 dark:bg-amber-950/20 shadow-xs">
+            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block">Open</span>
+            <h3 className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">{metrics.open}</h3>
+            <span className="text-[10px] text-amber-600/80 dark:text-amber-400/80">Pending triage</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-blue-200 bg-blue-50/20 shadow-xs">
-            <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">In Progress</span>
-            <h3 className="text-2xl font-black text-blue-600 mt-1">{metrics.inProgress}</h3>
-            <span className="text-[10px] text-blue-600/80">Work underway</span>
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/20 dark:bg-blue-950/20 shadow-xs">
+            <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider block">In Progress</span>
+            <h3 className="text-2xl font-black text-blue-600 dark:text-blue-400 mt-1">{metrics.inProgress}</h3>
+            <span className="text-[10px] text-blue-600/80 dark:text-blue-400/80">Active tasks</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/20 shadow-xs">
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Resolved</span>
-            <h3 className="text-2xl font-black text-emerald-600 mt-1">{metrics.resolved}</h3>
-            <span className="text-[10px] text-emerald-600/80">Closed tickets</span>
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-xs">
+            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block">Resolved</span>
+            <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{metrics.resolved}</h3>
+            <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80">Closed tickets</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-rose-300 bg-rose-50/40 shadow-xs ring-1 ring-rose-200 col-span-2 sm:col-span-1">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-rose-300 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/30 shadow-xs ring-1 ring-rose-300 dark:ring-rose-900 col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">Overdue Issues</span>
+              <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider block">Overdue</span>
               {metrics.overdue > 0 && <span className="flex h-2 w-2 rounded-full bg-rose-600 animate-ping" />}
             </div>
-            <h3 className="text-2xl font-black text-rose-600 mt-1">{metrics.overdue}</h3>
-            <span className="text-[10px] text-rose-700/80">&gt; {thresholdDays} days open</span>
+            <h3 className="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">{metrics.overdue}</h3>
+            <span className="text-[10px] text-rose-700/80 dark:text-rose-400/80">&gt; {thresholdDays} days open</span>
           </div>
         </div>
 
         {/* Complaints Table Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden space-y-4 p-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900">All Society Complaints</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">All Society Complaints</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Overdue items automatically surface at the top of the queue.
               </p>
             </div>
@@ -284,14 +276,14 @@ export default function AdminDashboardPage() {
                   placeholder="Search resident, title, unit..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48 sm:w-60"
+                  className="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48 sm:w-60"
                 />
               </div>
 
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="ALL">All Status</option>
                 <option value="OPEN">Open</option>
@@ -302,7 +294,7 @@ export default function AdminDashboardPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="ALL">All Categories</option>
                 <option value="PLUMBING">Plumbing</option>
@@ -317,7 +309,7 @@ export default function AdminDashboardPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="ALL">All Priority</option>
                 <option value="HIGH">High</option>
@@ -328,7 +320,7 @@ export default function AdminDashboardPage() {
               <select
                 value={overdueFilter}
                 onChange={(e) => setOverdueFilter(e.target.value)}
-                className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="ALL">Overdue: All</option>
                 <option value="OVERDUE">Overdue Only</option>
@@ -338,9 +330,9 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Table Container */}
-          <div className="overflow-x-auto border border-slate-100 rounded-xl">
+          <div className="overflow-x-auto border border-slate-100 dark:border-slate-800 rounded-xl">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Ticket & Details</th>
                   <th className="py-3 px-3">Resident / Unit</th>
@@ -351,10 +343,10 @@ export default function AdminDashboardPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredComplaints.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-400">
+                    <td colSpan={7} className="py-8 text-center text-slate-400 dark:text-slate-500">
                       No complaints match the selected filters.
                     </td>
                   </tr>
@@ -367,8 +359,8 @@ export default function AdminDashboardPage() {
                     return (
                       <tr
                         key={complaint.id}
-                        className={`hover:bg-slate-50/80 transition ${
-                          complaint.isOverdue ? 'bg-rose-50/20' : ''
+                        className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition ${
+                          complaint.isOverdue ? 'bg-rose-50/20 dark:bg-rose-950/20' : ''
                         }`}
                       >
                         {/* Title & Attachment */}
@@ -379,38 +371,38 @@ export default function AdminDashboardPage() {
                                 src={complaint.photoUrl}
                                 alt="thumb"
                                 onClick={() => setSelectedComplaint(complaint)}
-                                className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0 cursor-pointer shadow-xs"
+                                className="w-9 h-9 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer shadow-xs"
                               />
                             ) : (
-                              <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 text-[10px] font-bold">
+                              <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shrink-0 text-[10px] font-bold">
                                 {complaint.category.slice(0, 3)}
                               </div>
                             )}
                             <div>
                               <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-slate-900 line-clamp-1">{complaint.title}</span>
+                                <span className="font-bold text-slate-900 dark:text-white line-clamp-1">{complaint.title}</span>
                                 {complaint.isOverdue && (
                                   <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-black bg-rose-600 text-white uppercase shrink-0 animate-pulse">
                                     <AlertTriangle className="w-2.5 h-2.5" /> OVERDUE
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{complaint.description}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">{complaint.description}</p>
                             </div>
                           </div>
                         </td>
 
                         {/* Resident */}
                         <td className="py-3 px-3">
-                          <div className="font-semibold text-slate-800">{complaint.resident.name}</div>
-                          <span className="text-[11px] text-indigo-600 font-bold">
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{complaint.resident.name}</div>
+                          <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">
                             Unit: {complaint.resident.flatNumber || 'N/A'}
                           </span>
                         </td>
 
                         {/* Category */}
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 uppercase">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase">
                             {complaint.category}
                           </span>
                         </td>
@@ -422,10 +414,10 @@ export default function AdminDashboardPage() {
                             onChange={(e) => handleQuickPriorityChange(complaint.id, e.target.value)}
                             className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border focus:outline-none ${
                               complaint.priority === 'HIGH'
-                                ? 'bg-rose-100 text-rose-800 border-rose-300'
+                                ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
                                 : complaint.priority === 'MEDIUM'
-                                ? 'bg-amber-100 text-amber-800 border-amber-300'
-                                : 'bg-slate-100 text-slate-700 border-slate-300'
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'
                             }`}
                           >
                             <option value="LOW">Low</option>
@@ -439,10 +431,10 @@ export default function AdminDashboardPage() {
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
                               complaint.status === 'RESOLVED'
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                                 : complaint.status === 'IN_PROGRESS'
-                                ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                : 'bg-amber-50 text-amber-700 border-amber-200'
+                                ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                                : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                             }`}
                           >
                             {complaint.status === 'RESOLVED' ? (
@@ -457,9 +449,9 @@ export default function AdminDashboardPage() {
                         </td>
 
                         {/* Age / Date */}
-                        <td className="py-3 px-3 text-[11px] text-slate-500">
+                        <td className="py-3 px-3 text-[11px] text-slate-500 dark:text-slate-400">
                           <div>{daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}</div>
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">
                             {new Date(complaint.createdAt).toLocaleDateString()}
                           </span>
                         </td>
@@ -470,7 +462,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => setSelectedComplaint(complaint)}
                               title="View History Timeline"
-                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                              className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -496,10 +488,10 @@ export default function AdminDashboardPage() {
         {/* Bottom Section: Category Breakdown Reporting & Notice Board Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Category Analytics Card */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Layers className="w-4 h-4 text-indigo-600" />
-              <h3 className="font-bold text-slate-900 text-sm">Complaints by Category</h3>
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">Complaints by Category</h3>
             </div>
 
             <div className="space-y-2.5">
@@ -507,13 +499,13 @@ export default function AdminDashboardPage() {
                 const pct = metrics.total > 0 ? Math.round((count / metrics.total) * 100) : 0;
                 return (
                   <div key={cat} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
                       <span>{cat}</span>
-                      <span className="text-slate-500">{count} issues ({pct}%)</span>
+                      <span className="text-slate-500 dark:text-slate-400">{count} issues ({pct}%)</span>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                       <div
-                        className="h-full bg-indigo-600 rounded-full transition-all duration-300"
+                        className="h-full bg-indigo-600 dark:bg-indigo-500 rounded-full transition-all duration-300"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -523,13 +515,13 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Notice Board Management (2 cols on lg) */}
+          {/* Notice Board Management */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900">Live Notice Board Feed</h3>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Live Notice Board Feed</h3>
               <button
                 onClick={() => setIsNoticeModalOpen(true)}
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1"
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Add Notice</span>

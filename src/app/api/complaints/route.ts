@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getSessionFromRequest } from '@/lib/auth';
 import { createComplaintSchema } from '@/lib/validators';
 import { getOverdueThresholdDays, isComplaintOverdue } from '@/lib/overdue';
+import { notifyComplaintRaised } from '@/lib/email';
 
 export async function GET(request: NextRequest) {
   try {
@@ -175,6 +176,19 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Send confirmation email to the resident
+    if (fullComplaint && fullComplaint.resident.email) {
+      notifyComplaintRaised(
+        fullComplaint.resident.email,
+        fullComplaint.resident.name,
+        fullComplaint.title,
+        fullComplaint.category,
+        fullComplaint.description,
+        fullComplaint.id,
+        fullComplaint.priority
+      ).catch((err) => console.error('Failed to send complaint creation email:', err));
+    }
 
     return NextResponse.json(
       { message: 'Complaint raised successfully', complaint: fullComplaint },

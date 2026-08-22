@@ -7,8 +7,9 @@ import ComplaintCard from '@/components/ComplaintCard';
 import RaiseComplaintModal from '@/components/RaiseComplaintModal';
 import ComplaintDetailModal from '@/components/ComplaintDetailModal';
 import NoticeBoard, { NoticeItem } from '@/components/NoticeBoard';
+import FacilityCard, { FACILITIES } from '@/components/FacilityCard';
 import { UserSession, ComplaintWithDetails } from '@/lib/types';
-import { PlusCircle, Search, Filter, RefreshCw, AlertCircle, Clock, CheckCircle2, FileText, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Search, RefreshCw, FileText, Clock, CheckCircle2 } from 'lucide-react';
 
 export default function ResidentDashboard() {
   const router = useRouter();
@@ -74,7 +75,6 @@ export default function ResidentDashboard() {
     fetchSessionAndData();
   }, []);
 
-  // Filter complaints
   const filteredComplaints = complaints.filter((c) => {
     if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
     if (categoryFilter !== 'ALL' && c.category !== categoryFilter) return false;
@@ -89,7 +89,6 @@ export default function ResidentDashboard() {
     return true;
   });
 
-  // Calculate statistics
   const stats = {
     total: complaints.length,
     open: complaints.filter((c) => c.status === 'OPEN').length,
@@ -100,29 +99,31 @@ export default function ResidentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-semibold text-slate-500">Loading your resident dashboard...</p>
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading your resident dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-200">
       <Navbar user={user} onOpenRaiseModal={() => setIsRaiseModalOpen(true)} />
 
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
-        {/* Welcome & Quick Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        {/* Welcome Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div>
-            <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Resident Portal</span>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+              Resident Portal
+            </span>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Welcome back, {user?.name.split(' ')[0]}!
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Unit {user?.flatNumber || 'A-402'} • Track maintenance requests and view society notices in real time.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Unit {user?.flatNumber || 'A-402'} • Registered email: <strong>{user?.email}</strong>
             </p>
           </div>
 
@@ -134,7 +135,7 @@ export default function ResidentDashboard() {
                 fetchNotices();
               }}
               title="Refresh complaints"
-              className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-indigo-600' : ''}`} />
             </button>
@@ -148,20 +149,39 @@ export default function ResidentDashboard() {
           </div>
         </div>
 
+        {/* Quick Facility Cards Banner */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Society Facilities & Maintenance Services</h2>
+            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">Click category to raise</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+            {FACILITIES.map((facility) => (
+              <FacilityCard
+                key={facility.category}
+                facility={facility}
+                onSelect={(cat) => {
+                  setIsRaiseModalOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Stats Metrics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Raised</span>
-              <h3 className="text-2xl font-black text-slate-900">{stats.total}</h3>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white">{stats.total}</h3>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-black">
               <Clock className="w-5 h-5" />
             </div>
             <div>
@@ -170,8 +190,8 @@ export default function ResidentDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black">
               <RefreshCw className="w-5 h-5" />
             </div>
             <div>
@@ -180,8 +200,8 @@ export default function ResidentDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
@@ -191,12 +211,11 @@ export default function ResidentDashboard() {
           </div>
         </div>
 
-        {/* Main Content Layout: Complaints Grid (Left) + Notice Board (Right) */}
+        {/* Complaints Grid & Notice Board */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* Complaints Section (2 Cols on lg) */}
           <div className="lg:col-span-2 space-y-5">
             {/* Search & Filter Toolbar */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -205,7 +224,7 @@ export default function ResidentDashboard() {
                     placeholder="Search by title, description or category..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
@@ -213,18 +232,18 @@ export default function ResidentDashboard() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="ALL">All Statuses</option>
                     <option value="OPEN">Open Only</option>
-                    <option value="IN_PROGRESS">In Progress Only</option>
+                    <option value="IN_PROGRESS">In Progress</option>
                     <option value="RESOLVED">Resolved Only</option>
                   </select>
 
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="ALL">All Categories</option>
                     <option value="PLUMBING">Plumbing</option>
@@ -241,12 +260,12 @@ export default function ResidentDashboard() {
 
             {/* Complaints Cards Grid */}
             {filteredComplaints.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-12 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
                   <FileText className="w-6 h-6" />
                 </div>
-                <h4 className="text-base font-bold text-slate-800">No Complaints Found</h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                <h4 className="text-base font-bold text-slate-800 dark:text-slate-200">No Complaints Found</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                   {searchQuery || statusFilter !== 'ALL'
                     ? 'No complaints match your active filters. Try clearing your search.'
                     : 'You have not raised any maintenance requests yet. Click the button below to submit your first issue.'}
@@ -272,22 +291,9 @@ export default function ResidentDashboard() {
             )}
           </div>
 
-          {/* Notice Board Sidebar (1 Col on lg) */}
+          {/* Notice Board Sidebar */}
           <div className="space-y-6">
             <NoticeBoard notices={notices} />
-
-            {/* Help & Support Card */}
-            <div className="rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-5 space-y-3 shadow-md">
-              <h4 className="text-sm font-bold flex items-center gap-1.5 text-indigo-300">
-                <span>Emergency Helpdesk</span>
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                For urgent water pipe bursts, electrical fires, or lift entrapment, contact the 24/7 Society Security Gate immediately.
-              </p>
-              <div className="text-xs font-semibold text-white pt-1">
-                📞 Hotline: <span className="text-indigo-300">+91 98765 00000</span>
-              </div>
-            </div>
           </div>
         </div>
       </main>

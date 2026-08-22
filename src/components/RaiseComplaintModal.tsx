@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { X, Upload, Image as ImageIcon, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { X, Upload, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 interface RaiseComplaintModalProps {
   isOpen: boolean;
@@ -123,26 +123,28 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Raise a Maintenance Complaint</h3>
-            <p className="text-xs text-slate-500">Provide details and an optional photo for the maintenance team.</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Raise a Maintenance Complaint</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              You will receive an instant email notification with your tracking ticket.
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="flex items-center gap-2 p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -150,29 +152,29 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               Complaint Subject / Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. Water leaking under kitchen sink"
+              placeholder="e.g. Water pipe leaking under kitchen sink"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-slate-400"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
             />
           </div>
 
           {/* Category & Priority Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -183,7 +185,7 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Urgency / Priority
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -192,14 +194,14 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
                     key={p}
                     type="button"
                     onClick={() => setPriority(p)}
-                    className={`py-2 px-3 rounded-lg text-xs font-bold transition border ${
+                    className={`py-2 px-3 rounded-xl text-xs font-extrabold transition border ${
                       priority === p
                         ? p === 'HIGH'
-                          ? 'bg-rose-50 border-rose-500 text-rose-700 shadow-sm'
+                          ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 shadow-xs'
                           : p === 'MEDIUM'
-                          ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm'
-                          : 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-700 dark:text-amber-300 shadow-xs'
+                          : 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                     }`}
                   >
                     {p}
@@ -211,44 +213,44 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               Detailed Description <span className="text-red-500">*</span>
             </label>
             <textarea
               required
               rows={3}
-              placeholder="Describe the issue in detail, exact location, when it started, etc."
+              placeholder="Describe the issue, exact flat location, when it started, etc."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-slate-400"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
             />
           </div>
 
           {/* Photo Upload */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               Supporting Photo (Optional)
             </label>
 
             {photoUrl ? (
-              <div className="relative rounded-xl border border-slate-200 p-2 bg-slate-50 flex items-center justify-between">
+              <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
                     src={photoUrl}
                     alt="Uploaded attachment"
-                    className="w-14 h-14 rounded-lg object-cover border border-slate-200 shadow-sm"
+                    className="w-14 h-14 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shadow-xs"
                   />
                   <div>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Photo Attached
                     </span>
-                    <p className="text-[11px] text-slate-500">Ready to submit with complaint</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Ready to submit with complaint</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPhotoUrl('')}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 transition"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
                 >
                   Remove
                 </button>
@@ -264,8 +266,8 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
                 onClick={() => fileInputRef.current?.click()}
                 className={`cursor-pointer rounded-xl border-2 border-dashed p-4 text-center transition ${
                   dragOver
-                    ? 'border-indigo-500 bg-indigo-50/50'
-                    : 'border-slate-300 hover:border-indigo-400 bg-slate-50/50'
+                    ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30'
+                    : 'border-slate-300 dark:border-slate-700 hover:border-indigo-400 bg-slate-50/50 dark:bg-slate-800/40'
                 }`}
               >
                 <input
@@ -276,15 +278,15 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
                   className="hidden"
                 />
                 {uploading ? (
-                  <div className="flex items-center justify-center gap-2 text-indigo-600 text-xs font-semibold py-2">
+                  <div className="flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-semibold py-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Uploading photo...</span>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-1.5 py-1 text-slate-500">
-                    <Upload className="w-6 h-6 text-slate-400" />
+                  <div className="flex flex-col items-center justify-center gap-1 py-1 text-slate-500 dark:text-slate-400">
+                    <Upload className="w-5 h-5 text-slate-400" />
                     <p className="text-xs font-medium">
-                      <span className="text-indigo-600 font-semibold">Click to upload</span> or drag and drop
+                      <span className="text-indigo-600 dark:text-indigo-400 font-bold">Click to upload</span> or drag and drop
                     </p>
                     <p className="text-[10px] text-slate-400">JPEG, PNG, or WebP (max 5MB)</p>
                   </div>
@@ -294,20 +296,20 @@ export default function RaiseComplaintModal({ isOpen, onClose, onComplaintCreate
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition"
+              className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || uploading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition"
             >
-              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{submitting ? 'Submitting...' : 'Submit Complaint'}</span>
             </button>
           </div>
