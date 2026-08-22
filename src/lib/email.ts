@@ -10,7 +10,7 @@ interface EmailPayload {
 function getTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const pass = process.env.SMTP_PASS?.replace(/\s+/g, '');
   const port = Number(process.env.SMTP_PORT) || 587;
 
   if (host && user && pass) {
@@ -19,6 +19,9 @@ function getTransporter() {
       port,
       secure: port === 465,
       auth: { user, pass },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
   }
 
