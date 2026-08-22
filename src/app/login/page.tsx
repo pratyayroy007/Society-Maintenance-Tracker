@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Building2, Lock, Mail, AlertCircle, Loader2, ArrowRight, UserCheck, Shield, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 
 export default function LoginPage() {
-  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,23 +21,22 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || 'Invalid email or password');
       }
 
-      if (data.user.role === 'ADMIN') {
-        router.push('/admin');
+      // Instant clean full-page navigation
+      if (data.user?.role === 'ADMIN') {
+        window.location.href = '/admin';
       } else {
-        router.push('/resident');
+        window.location.href = '/resident';
       }
-      router.refresh();
     } catch (err: any) {
       setError(err.message || 'Invalid credentials');
-    } finally {
       setLoading(false);
     }
   };
@@ -51,7 +48,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-200">
-      {/* Theme Toggle Top Right */}
       <div className="absolute top-4 right-4">
         <button
           onClick={toggleTheme}
@@ -66,7 +62,7 @@ export default function LoginPage() {
           <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
             <Building2 className="w-6 h-6" />
           </div>
-          <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">SocietyCare</span>
+          <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Residenza</span>
         </Link>
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Sign in to your account</h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">

@@ -7,22 +7,30 @@ interface EmailPayload {
   html: string;
 }
 
+let cachedTransporter: any = null;
+
 function getTransporter() {
+  if (cachedTransporter) return cachedTransporter;
+
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS?.replace(/\s+/g, '');
   const port = Number(process.env.SMTP_PORT) || 587;
 
   if (host && user && pass) {
-    return nodemailer.createTransport({
+    cachedTransporter = nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
       auth: { user, pass },
+      connectionTimeout: 4000,
+      greetingTimeout: 4000,
+      socketTimeout: 4000,
       tls: {
         rejectUnauthorized: false,
       },
     });
+    return cachedTransporter;
   }
 
   return null;
@@ -39,7 +47,7 @@ export async function sendEmail({ to, subject, html }: EmailPayload): Promise<{ 
   const transporter = getTransporter();
   if (transporter) {
     try {
-      const from = process.env.SMTP_FROM || `"SocietyCare" <${process.env.SMTP_USER}>`;
+      const from = process.env.SMTP_FROM || `"Residenza" <${process.env.SMTP_USER}>`;
       const info = await transporter.sendMail({
         from,
         to,
@@ -66,7 +74,7 @@ export async function sendEmail({ to, subject, html }: EmailPayload): Promise<{ 
             Authorization: `Bearer ${resendKey}`,
           },
           body: JSON.stringify({
-            from: 'SocietyCare <onboarding@resend.dev>',
+            from: 'Residenza <onboarding@resend.dev>',
             to: recipientList,
             subject,
             html,
@@ -85,13 +93,7 @@ export async function sendEmail({ to, subject, html }: EmailPayload): Promise<{ 
     }
   }
 
-  // Always log to console in dev mode
-  console.log(`\n📬 [DISPATCHED EMAIL NOTIFICATION]`);
-  console.log(`To: ${recipientsString}`);
-  console.log(`Subject: ${subject}`);
-  console.log(`Status: ${sentSuccessfully ? 'DELIVERED TO INBOX' : 'STORED IN APP INBOX (Add SMTP_USER/SMTP_PASS in .env for external inbox delivery)'}\n`);
-
-  // Persist each recipient's email in the database for the In-App Notification Inbox
+  // Persist in DB for the In-App Notification Center
   try {
     for (const recipient of recipientList) {
       await prisma.emailLog.create({
@@ -125,14 +127,14 @@ export async function notifyComplaintRaised(
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 22px; border-radius: 8px; text-align: center; color: #ffffff;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: -0.5px;">🏢 SocietyCare Maintenance</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: -0.5px;">🏢 Residenza Maintenance</h2>
         <p style="margin: 6px 0 0 0; opacity: 0.95; font-size: 13px; font-weight: 500;">Ticket Confirmation #${ticketRef}</p>
       </div>
 
       <div style="padding: 24px 8px 16px 8px; color: #1e293b;">
         <p style="font-size: 15px; margin-top: 0;">Dear <strong>${residentName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-          Your maintenance complaint has been successfully registered in the society portal. Our administration team has been notified.
+          Your maintenance complaint has been registered in the Residenza portal. Our administration team has been notified.
         </p>
 
         <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 18px; margin: 20px 0; border-radius: 6px;">
@@ -150,17 +152,17 @@ export async function notifyComplaintRaised(
               <td style="padding: 6px 0;"><span style="background: #e0e7ff; color: #3730a3; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">${category}</span></td>
             </tr>
             <tr>
-              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Initial Status:</td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Status:</td>
               <td style="padding: 6px 0;"><span style="color: #d97706; font-weight: bold;">OPEN (Pending Triage)</span></td>
             </tr>
             <tr>
-              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Priority Level:</td>
+              <td style="padding: 6px 0; font-weight: bold; color: #64748b;">Priority:</td>
               <td style="padding: 6px 0; font-weight: bold;">${priority}</td>
             </tr>
           </table>
 
           <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
-            <strong style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Issue Description:</strong>
+            <strong style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Description:</strong>
             <p style="margin: 6px 0 0 0; font-size: 13px; color: #334155; line-height: 1.5;">${description}</p>
           </div>
         </div>
@@ -171,7 +173,7 @@ export async function notifyComplaintRaised(
 
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
         <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">
-          SocietyCare Apartment Maintenance & Complaint Management System
+          Residenza Apartment Maintenance & Complaint Management System
         </p>
       </div>
     </div>
@@ -203,12 +205,12 @@ export async function notifyStatusChange(
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
       <div style="background-color: #4f46e5; padding: 20px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">🏢 SocietyCare Status Update</h2>
+        <h2 style="margin: 0; font-size: 20px;">🏢 Residenza Status Update</h2>
       </div>
       <div style="padding: 20px 8px 8px 8px; color: #1e293b;">
         <p style="font-size: 15px;">Dear <strong>${residentName}</strong>,</p>
         <p style="font-size: 14px; color: #475569;">
-          Your maintenance request status has been updated by the society administrator:
+          Your maintenance request status has been updated:
         </p>
         
         <div style="background-color: #f8fafc; border-left: 4px solid ${color}; padding: 16px; margin: 18px 0; border-radius: 6px;">
@@ -217,9 +219,9 @@ export async function notifyStatusChange(
           ${note ? `<p style="margin: 0; font-size: 13px; color: #334155;"><strong>Admin Remarks:</strong> <em style="color: #475569;">"${note}"</em></p>` : ''}
         </div>
 
-        <p style="font-size: 13px; color: #64748b;">You can log in to your resident dashboard anytime to track progress.</p>
+        <p style="font-size: 13px; color: #64748b;">Log in to your portal to track progress.</p>
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0 12px 0;" />
-        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">SocietyCare Automated Notification System</p>
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Residenza Automated Notification System</p>
       </div>
     </div>
   `;
@@ -251,7 +253,7 @@ export async function notifyImportantNotice(noticeTitle: string, noticeContent: 
           <h3 style="color: #0f172a; margin-top: 0; font-size: 17px;">${noticeTitle}</h3>
           <p style="color: #334155; line-height: 1.6; font-size: 14px; white-space: pre-wrap;">${noticeContent}</p>
           <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0 12px 0;" />
-          <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Society Management Committee</p>
+          <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Residenza Management Committee</p>
         </div>
       </div>
     `;

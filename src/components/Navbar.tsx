@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { Building2, LogOut, PlusCircle, Sun, Moon, Bell, Mail } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Building2, LogOut, PlusCircle, Sun, Moon, Mail } from 'lucide-react';
 import { UserSession } from '@/lib/types';
 import { useTheme } from './ThemeContext';
 import EmailInboxModal, { EmailNotification } from './EmailInboxModal';
@@ -14,7 +14,6 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user, onOpenRaiseModal }: NavbarProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
 
@@ -37,18 +36,16 @@ export default function Navbar({ user, onOpenRaiseModal }: NavbarProps) {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 10000); // Polling every 10s
-      return () => clearInterval(interval);
     }
-  }, [user]);
+  }, [user?.email]);
 
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
-      router.refresh();
     } catch (err) {
       console.error('Logout error:', err);
+    } finally {
+      window.location.href = '/login';
     }
   };
 
@@ -60,7 +57,7 @@ export default function Navbar({ user, onOpenRaiseModal }: NavbarProps) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } else {
-      router.push('/resident#my-complaints-section');
+      window.location.href = '/resident#my-complaints-section';
     }
   };
 
@@ -77,7 +74,7 @@ export default function Navbar({ user, onOpenRaiseModal }: NavbarProps) {
                 </div>
                 <div>
                   <span className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight block">
-                    SocietyCare
+                    Residenza
                   </span>
                   <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold tracking-wider uppercase block -mt-1">
                     Maintenance Portal
@@ -111,7 +108,10 @@ export default function Navbar({ user, onOpenRaiseModal }: NavbarProps) {
               {/* In-App Email Notifications Bell */}
               {user && (
                 <button
-                  onClick={() => setIsInboxOpen(true)}
+                  onClick={() => {
+                    fetchNotifications();
+                    setIsInboxOpen(true);
+                  }}
                   title="View Email Notifications"
                   className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 >
