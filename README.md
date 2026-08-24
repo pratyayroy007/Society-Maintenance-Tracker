@@ -1,4 +1,4 @@
-# 🏢 Residenza — Society Maintenance Tracker
+## Residenza — Society Maintenance Tracker
 
 <div align="center">
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 📖 Executive Summary
+## Executive Summary
 
 **Residenza** is a full-stack, enterprise-grade apartment society maintenance and facility complaint resolution portal. Designed around the modern **`satnaing/shadcn-admin`** dashboard paradigm, it bridges the communication gap between residential apartment occupants and housing society managing committees.
 
@@ -25,9 +25,9 @@ Residents can submit categorized maintenance issues with supporting photographic
 
 ---
 
-## ✨ Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🏡 Resident Experience
+###  Resident Experience
 - **Interactive Dashboard**: Modern collapsible sidebar layout with high-level personal metrics (Total Raised, Pending Triage, In Progress, Resolved).
 - **Facility Service Quick-Selector**: Visual category cards with high-definition facility imagery (Plumbing, Electrical, Elevator, Security, Housekeeping, Carpentry).
 - **Multi-Part Ticket Filing**: Title, category, urgency/priority, rich descriptions, and photo evidence upload (JPEG/PNG/WebP with 5MB validation).
@@ -35,7 +35,7 @@ Residents can submit categorized maintenance issues with supporting photographic
 - **In-App Notification Center**: Built-in email preview drawer with real-time badge count to inspect all sent communications directly in the browser.
 - **Society Notice Feed**: Real-time announcements with pinned priority badges for urgent building alerts.
 
-### 🛡️ Administrator Operations Center
+###  Administrator Operations Center
 - **Triage Command Table**: Filter by Status (`OPEN`, `IN_PROGRESS`, `RESOLVED`), Category (8 types), Priority (`LOW`, `MEDIUM`, `HIGH`), and Overdue SLA.
 - **Smart Queue Sorting**: Overdue tickets exceeding the society SLA threshold automatically float to the top of the triage table with animated visual alerts.
 - **Status Transition Workflow**: Modal capturing mandatory/optional administrative notes saved into the immutable audit history.
@@ -43,19 +43,19 @@ Residents can submit categorized maintenance issues with supporting photographic
 - **Notice Publishing & Broadcasting**: Post society announcements with optional `isImportant` pinning that automatically broadcasts urgent emails to all residents.
 - **Category Analytics**: Proportional visual progress bars tracking issue distribution across society assets for preventive maintenance planning.
 
-### 🎨 Design & Accessibility
+###  Design & Accessibility
 - **`satnaing/shadcn-admin` Design System**: Collapsible sidebar, sticky top header, segmented tab switches, and high-contrast tables.
 - **Light & Dark Theme Switcher**: Full HSL design token support with smooth transitions, persistent `localStorage` memory, and system preference detection.
 - **Responsive Architecture**: Mobile-friendly navigation with responsive tables and modals.
 
-### 📬 Asynchronous Email Notification Engine
+###  Asynchronous Email Notification Engine
 - **Live Google SMTP Delivery**: Pre-configured for official society email (`societymaintainence@gmail.com`) with TLS proxy resilience.
 - **Multi-Provider Support**: Seamless support for Gmail App Passwords, Resend API (`RESEND_API_KEY`), and safe development console mock fallback.
 - **Non-Blocking Architecture**: Fire-and-forget background execution with 4-second connection timeouts ensuring sub-50ms API response latency.
 
 ---
 
-## 🏗️ Technical Architecture & Tech Stack
+##  Technical Architecture & Tech Stack
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -89,7 +89,7 @@ Residents can submit categorized maintenance issues with supporting photographic
 
 ---
 
-## 📁 Repository Directory Structure
+##  Repository Directory Structure
 
 ```text
 society-maintenance-tracker/
@@ -157,7 +157,7 @@ society-maintenance-tracker/
 
 ---
 
-## 🚀 Installation & Quick Start Guide
+##  Installation & Quick Start Guide
 
 ### 1. Prerequisites
 - **Node.js**: v18.0+ or v22.x LTS
@@ -212,7 +212,7 @@ Navigate to **`http://localhost:3000`** in your browser.
 
 ---
 
-## 🔑 Demo User Credentials
+##  Demo User Credentials
 
 The database seed script automatically provisions the following accounts:
 
@@ -226,7 +226,7 @@ The database seed script automatically provisions the following accounts:
 
 ---
 
-## 📊 Database Schema & Entity Relationships
+##  Database Schema & Entity Relationships
 
 ```text
 ┌─────────────────┐       1:N       ┌────────────────────────┐
@@ -310,7 +310,7 @@ The database seed script automatically provisions the following accounts:
 
 ---
 
-## 📡 REST API Reference
+##  REST API Reference
 
 All API routes authenticate via the `auth-token` HTTP-only cookie or standard `Authorization: Bearer <token>` header.
 
@@ -418,7 +418,7 @@ Upload photo attachment evidence (Multipart `FormData` with 5MB MIME validation)
 
 ---
 
-## 🧪 Automated Testing
+##  Automated Testing
 
 Residenza includes automated end-to-end test suites covering API security, RBAC authorization, SLA calculation, and email dispatch.
 
@@ -441,7 +441,7 @@ npm run build
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 A multi-stage Docker build is included:
 
@@ -455,6 +455,6 @@ docker run -p 3000:3000 --env-file .env residenza-app
 
 ---
 
-## 📄 License & Attribution
+##  License & Attribution
 
 Developed for the **Society Maintenance Tracker** technical evaluation. Built with modern web standards and MIT License.
