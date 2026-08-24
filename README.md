@@ -1,4 +1,4 @@
-## Residenza — Society Maintenance Tracker
+# 🏢 Residenza — Society Maintenance Tracker
 
 <div align="center">
 
@@ -6,14 +6,21 @@
 
 **Next-Generation Apartment Society Maintenance & Complaint Management Platform**
 
+[![Live Demo on Vercel](https://img.shields.io/badge/Live_Demo-Vercel_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://society-maintenance-tracker2-nu.vercel.app)
+
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-6.4-2d3748?style=flat&logo=prisma)](https://www.prisma.io/)
+[![Neon Postgres](https://img.shields.io/badge/Database-Neon_PostgreSQL-00E599?style=flat&logo=postgresql&logoColor=white)](https://neon.tech/)
 [![shadcn/ui](https://img.shields.io/badge/UI-shadcn--admin-black?style=flat)](https://ui.shadcn.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+### 🌐 Live Production Application
+**[https://society-maintenance-tracker2-nu.vercel.app](https://society-maintenance-tracker2-nu.vercel.app)**
+
 </div>
+
 
 ---
 
