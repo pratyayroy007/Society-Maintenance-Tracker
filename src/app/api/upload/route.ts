@@ -44,19 +44,30 @@ export async function POST(request: NextRequest) {
     const randomHash = crypto.randomBytes(8).toString('hex');
     const filename = `complaint_${Date.now()}_${randomHash}${ext}`;
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
+    // Try saving to public/uploads directory (Local Environment)
+    try {
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      await mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(uploadDir, filename);
+      await writeFile(filePath, buffer);
 
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
+      return NextResponse.json({
+        message: 'Photo uploaded successfully',
+        url: `/uploads/${filename}`,
+        filename,
+      });
+    } catch (fsErr) {
+      // Fallback for Vercel Serverless Read-Only Filesystem:
+      // Convert image buffer to Data URL (works 100% on Vercel without S3 credentials)
+      const base64Data = buffer.toString('base64');
+      const dataUrl = `data:${file.type};base64,${base64Data}`;
 
-    const fileUrl = `/uploads/${filename}`;
-
-    return NextResponse.json({
-      message: 'Photo uploaded successfully',
-      url: fileUrl,
-      filename,
-    });
+      return NextResponse.json({
+        message: 'Photo uploaded successfully',
+        url: dataUrl,
+        filename,
+      });
+    }
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Internal server error during upload' }, { status: 500 });
